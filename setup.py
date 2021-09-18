@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='yamlalchemy',
-    version='0.1.1',
+    version='0.1.2',
     description='YAMLAlchemy is a Python-based library to convert YAML to SQLAlchemy read-only queries.',
     long_description=long_description,
     long_description_content_type='text/markdown',

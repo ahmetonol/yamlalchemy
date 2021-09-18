@@ -81,8 +81,6 @@ df = pd.read_sql_query(qs.statement, session.connection())
 
 ## YAML Query Language Syntax
 
-Description
-
 ### FROM
 
 Name of the table from which to select data. For now, YAMLAlchemy supports only one table.
