@@ -244,6 +244,12 @@ Specifying an offset from where to start returning data.
 $offset: 10
 ```
 
+## Running tests
+
+```shell
+ python -m unittest tests/test_parser.py
+```
+
 ## Roadmap
 
 - Joins
