@@ -244,6 +244,11 @@ Specifying an offset from where to start returning data.
 $offset: 10
 ```
 
+## Roadmap
+
+- Joins
+- Sub Queries
+
 ## License
 
 MIT License
