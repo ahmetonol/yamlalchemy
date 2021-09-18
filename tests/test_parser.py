@@ -12,11 +12,11 @@ base = automap_base()
 def get_engine() -> str:
     uri = URL.create(**{
         'drivername': "mysql+pymysql",
-        "username": "root",
-        "host": "127.0.0.1",
+        "username": "guest",
+        "host": "relational.fit.cvut.cz",
         "port": "3306",
-        "password": "q1w2e3r4t5",
-        "database": "datasets"
+        "password": "relational",
+        "database": "AdventureWorks2014"
     })
 
     engine = create_engine(uri)
@@ -27,53 +27,67 @@ def get_engine() -> str:
 class TestParser(unittest.TestCase):
     def test_query(self):
         yaml_content = """
-            $from: ramen_ratings
+            $from: Product
             $column:
                 -
-                    $name: Style
-                    $alias: Stil
+                    $name: Color
+                    $alias: Color of Product
                 -
-                    $name: Country
-                    $alias: Ülke
+                    $name: SafetyStockLevel
+                    $alias: Minimum Inventory Amount
+                    $func: sum
                 -
-                    $name: Stars
-                    $alias: Yıldız Sayısı
-                    $func: count
+                    $name: ListPrice
+                    $alias: List Price of Product
+                    $func: avg
             $group:
                 -
-                    $name: Style
-                -
-                    $name: Country
-            $order:
-                -
-                    $name: Stars
-                    $func: count
-                    $direction: desc
-                -
-                    $name: Style
-                    $direction: asc
+                    $name: Color    
             $where:
                 -
-                    $name: Style
-                    $filter: 
-                        $or:
-                            $startswith:
-                                - c
-                                - K
+                    $name: Class
+                    $filter:
+                        $contains:
+                            - A
+                -
+                    $name: Class
+                    $filter:
+                        $is: null
+
+                -
+                    $name: Color
+                    $filter:
+                        $nis: null
+                -
+                    $name: SellStartDate
+                    $filter:
+                        $gt: 2013-01-01
+            
+            $having:
+                -
+                    $name: SafetyStockLevel
+                    $func: sum
+                    $filter:
+                        $and:
+                            $gt: 1
+                            $lt: 1000
+            $order:
+                -
+                    $name: Name
+                    $direction: asc
+            $limit: 10
+            $offset: 0
 
                     
         """
         engine = get_engine()
         base.prepare(engine, reflect=True)
         session = Session(engine)
-        """
-        qs = Parser.parse(yaml_content).to_query(session, base)
-        """
         qs = parse(yaml_content, session, base).to_query()
         self.assertIsInstance(qs, Query)
 
         df = pd.read_sql_query(qs.statement, session.connection())
-        self.assertIsInstance(df, pd.DataFrame)
+        # self.assertIsInstance(df, pd.DataFrame)
         # self.assertListEqual(df.columns.tolist(), ['Stil', 'Ülke', 'Counf of Stars'])
         print(qs.statement)
         print(df)

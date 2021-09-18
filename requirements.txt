@@ -1,6 +1,2 @@
-greenlet==1.1.1
-importlib-metadata==4.6.3
-PyYAML==5.4.1
-SQLAlchemy==1.4.22
-typing-extensions==3.10.0.0
-zipp==3.5.0
+SQLAlchemy>1.4
+PyYAML>5.1

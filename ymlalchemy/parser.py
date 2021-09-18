@@ -1,5 +1,7 @@
-from os import name
-from typing import Dict, List
+
+__all__ = ['parse']
+
+from typing import List
 from sqlalchemy.ext.automap import AutomapBase
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.schema import Table, Column
@@ -7,7 +9,7 @@ import yaml
 from ymlalchemy.contants import *
 from sqlalchemy import MetaData
 from sqlalchemy.sql.functions import func
-from sqlalchemy.sql.expression import and_, or_, not_
+from ymlalchemy.statement import _order, _where, _limit, _offset, _having
 
 
 metadata = MetaData()
@@ -17,9 +19,12 @@ class QueryBuilder:
     session = None
     table = None
     columns = []
-    groups = []
+    group = []
     order_by = []
     where = []
+    having = []
+    limit = None
+    offset = None
 
     def __init__(self, session: Session):
         self.session = session
@@ -30,8 +35,8 @@ class QueryBuilder:
     def set_columns(self, columns: List[Column]):
         self.columns = columns
 
-    def set_groups(self, groups: List[Column]):
-        self.groups = groups
+    def set_group(self, group: List[Column]):
+        self.group = group
 
     def set_order_by(self, order_by: List[Column]):
         self.order_by = order_by
@@ -39,81 +44,38 @@ class QueryBuilder:
     def set_where(self, where_clause: List[Column]):
         self.where = where_clause
 
+    def set_having(self, having_clause: List[Column]):
+        self.having = having_clause
+
+    def set_limit(self, limit: int):
+        self.limit = limit
+
+    def set_offset(self, offset: int):
+        self.offset = offset
+
     def to_query(self):
         query = self.session.query(self.table)
         query = query.with_entities(*self.columns)
         query = query.filter(*self.where)
-        query = query.group_by(*self.groups)
+        query = query.group_by(*self.group)
         query = query.order_by(*self.order_by)
+        query = _having(self.having, query)
+        query = _limit(self.limit, query)
+        query = _offset(self.offset, query)
+
         return query
 
 
-def where(col: Column, where_clause: List[dict]) -> Column:
-    for op, clause in where_clause.items():
-        filter_criteria = []
-        if op in OPERATORS:
-            for comp, values in clause.items():
-                if isinstance(values, list) is False:
-                    values = [values]
-                if comp in COMPARATORS:
-                    if comp == COMP_NEQ:
-                        _values = [col != value for value in values]
-                    if comp == COMP_GT:
-                        _values = [col > value for value in values]
-                    if comp == COMP_GTE:
-                        _values = [col >= value for value in values]
-                    if comp == COMP_LT:
-                        _values = [col < value for value in values]
-                    if comp == COMP_LTE:
-                        _values = [col <= value for value in values]
-                    if comp == COMP_EQ:
-                        _values = [col == value for value in values]
-                    if comp == COMP_LIKE:
-                        _values = [col.like(value) for value in values]
-                    if comp == COMP_NLIKE:
-                        _values = [col.not_like(value)
-                                   for value in values]
-                    if comp == COMP_ILIKE:
-                        _values = [col.ilike(value)
-                                   for value in values]
-                    if comp == COMP_NILIKE:
-                        _values = [col.not_ilike(value)
-                                   for value in values]
-                    if comp == COMP_IN:
-                        _values = [col.in_(values)]
-                    if comp == COMP_NIN:
-                        _values = [col.notin_(values)]
-                    if comp == COMP_IS:
-                        _values = [col.is_(value) for value in values]
-                    if comp == COMP_NIS:
-                        _values = [col.is_not(value)
-                                   for value in values]
-                    if comp == COMP_CONTAINS:
-                        _values = [col.contains(value)
-                                   for value in values]
-                    if comp == COMP_STARTS_WITH:
-                        _values = [col.startswith(value)
-                                   for value in values]
-                    if comp == COMP_ENDS_WITH:
-                        _values = [col.endswith(value)
-                                   for value in values]
-
-                    filter_criteria.extend(_values)
-
-        if op in COMPARATORS:
-            pass
-        col = and_(*filter_criteria)
-        if op == OP_OR:
-            col = or_(*filter_criteria)
-        if op == OP_NOT:
-            col = not_(*filter_criteria)
-    return col
-
-
 def query_fragment(table: Table, columns: List[dict]) -> List[Column]:
+    """
+    args:
+        table: SQLAlchemy table class
+        columns: yaml table dictionary.
+    """
+
     if isinstance(columns, list) is False:
         raise Exception(
-            f"Columns must be as list of dict. {type(columns)} given.")
+            f"Columns must be list. {type(columns)} given.")
 
     cols = []
     for column in columns:
@@ -127,15 +89,13 @@ def query_fragment(table: Table, columns: List[dict]) -> List[Column]:
         if expr is not None:
             column_aggr_func = getattr(func, expr)
             col = column_aggr_func(col)
+            col = col.label(name)
 
         if direction is not None and direction in QUERY_ORDERS:
-            if direction.lower() == ORDER_ASC:
-                col = col.asc()
-            if direction.lower() == ORDER_DESC:
-                col = col.desc()
+            col = _order(col, direction)
 
         if where_clause is not None:
-            col = where(col, where_clause)
+            col = _where(col, where_clause)
 
         if alias:
             col = col.label(alias)
@@ -159,6 +119,7 @@ def parse(yaml_content: str or dict, session: Session, reflection: AutomapBase) 
     if not yaml_content:
         raise Exception('No yaml content given.')
     qd = yaml_content
+
     if isinstance(yaml_content, dict) is False:
         qd = yaml.safe_load(yaml_content)
 
@@ -179,19 +140,35 @@ def parse(yaml_content: str or dict, session: Session, reflection: AutomapBase) 
         qd[ORDER] = []
 
     if WHERE not in qd:
-        qd[WHERE] = {}
+        qd[WHERE] = []
+
+    if HAVING not in qd:
+        qd[HAVING] = []
+
+    if LIMIT not in qd:
+        qd[LIMIT] = None
+
+    if OFFSET not in qd:
+        qd[OFFSET] = None
 
     table = reflection.classes[qd[FROM]]
     columns = query_fragment(table, qd[COLUMN])
     group_by = query_fragment(table, qd[GROUP])
     order_by = query_fragment(table, qd[ORDER])
     where = query_fragment(table, qd[WHERE])
+    having = query_fragment(table, qd[HAVING])
+
+    limit = qd[LIMIT]
+    offset = qd[OFFSET]
 
     qb = QueryBuilder(session=session)
     qb.set_table(table)
     qb.set_columns(columns)
     qb.set_where(where)
-    qb.set_groups(group_by)
+    qb.set_group(group_by)
+    qb.set_having(having)
     qb.set_order_by(order_by)
+    qb.set_limit(limit)
+    qb.set_offset(offset)
 
     return qb

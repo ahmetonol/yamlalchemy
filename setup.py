@@ -10,7 +10,10 @@ setup(
     author_email='onol.ahmet@gmail.com',
     license='MIT',
     packages=['ymlalchemy'],
-    install_requires=[],
+    install_requires=[
+        'PyYAML',
+        'SQLAlchemy'
+    ],
 
     classifiers=[
         'License :: OSI Approved :: MIT License',

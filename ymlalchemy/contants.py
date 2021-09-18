@@ -34,10 +34,15 @@ __all__ = [
     'COMP_STARTS_WITH',
     'COMP_ENDS_WITH',
     'COMPARATORS',
+    'LIMIT',
+    'OFFSET',
+    'HAVING'
 ]
 
 
 FROM = '$from'
+LIMIT = '$limit'
+OFFSET = '$offset'
 COLUMN = '$column'
 GROUP = '$group'
 FUNC = '$func'
@@ -48,6 +53,7 @@ DIRECTION = '$direction'
 
 WHERE = '$where'
 FILTER = '$filter'
+HAVING = '$having'
 
 OP_AND = "$and"
 OP_OR = "$or"
