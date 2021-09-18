@@ -1,5 +1,8 @@
 # YAMLAlchemy
 
+[![PyPI](https://img.shields.io/pypi/v/yamlalchemy.svg)](https://pypi.python.org/pypi/yamlalchemy)
+[![PyPI](https://img.shields.io/pypi/pyversions/yamlalchemy.svg)](https://pypi.python.org/pypi/yamlalchemy)
+
 YAMLAlchemy is a Python-based library to convert YAML string to SQLAlchemy read-only queries.
 
 ## Installation
