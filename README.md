@@ -1,5 +1,6 @@
 # YAMLAlchemy
 
+[![Build Status](https://app.travis-ci.com/ahmetonol/yamlalchemy.svg?branch=master)](https://travis-ci.org/ahmetonol/yamlalchemy)
 [![PyPI](https://img.shields.io/pypi/v/yamlalchemy.svg)](https://pypi.python.org/pypi/yamlalchemy)
 [![PyPI](https://img.shields.io/pypi/pyversions/yamlalchemy.svg)](https://pypi.python.org/pypi/yamlalchemy)
 
