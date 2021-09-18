@@ -1,10 +1,16 @@
 #
 from setuptools import setup
+from pathlib import Path
+
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='yamlalchemy',
     version='0.1.0',
     description='YAMLAlchemy is a Python-based library to convert YAML to SQLAlchemy read-only queries.',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://github.com/ahmetonol/yamlalchemy',
     author='Ahmet Onol',
     author_email='onol.ahmet@gmail.com',
