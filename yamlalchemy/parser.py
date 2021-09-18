@@ -6,10 +6,10 @@ from sqlalchemy.ext.automap import AutomapBase
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.schema import Table, Column
 import yaml
-from ymlalchemy.contants import *
+from yamlalchemy.contants import *
 from sqlalchemy import MetaData
 from sqlalchemy.sql.functions import func
-from ymlalchemy.statement import _order, _where, _limit, _offset, _having
+from yamlalchemy.statement import _order, _where, _limit, _offset, _having
 
 
 metadata = MetaData()
@@ -107,7 +107,7 @@ def query_fragment(table: Table, columns: List[dict]) -> List[Column]:
 
 def parse(yaml_content: str or dict, session: Session, reflection: AutomapBase) -> "QueryBuilder":
     """
-    Initial entry point for ymlalchemy.
+    Initial entry point for yamlalchemy.
     Parses the given YAML string to create a SqlAlchemy query
 
     args:

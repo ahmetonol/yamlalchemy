@@ -1,13 +1,78 @@
-# YMLAlchemy
+# YAMLAlchemy
 
-YMLAlchemy is a Python-based library to convert YAML string to SQLAlchemy read-only queries.
+YAMLAlchemy is a Python-based library to convert YAML string to SQLAlchemy read-only queries.
 
 ## Installation
 
 Installation via PyPI:
 
 ```shell
- pip install ymlalchemy
+ pip install yamlalchemy
+```
+
+## Usage
+
+```python
+from yamlalchemy import parse
+from sqlalchemy.engine import URL
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+from sqlalchemy.ext.automap import automap_base
+import pandas as pd
+
+
+uri = URL.create(**{
+    'drivername': "mysql+pymysql",
+    "username": "guest",
+    "host": "relational.fit.cvut.cz",
+    "port": "3306",
+    "password": "relational",
+    "database": "AdventureWorks2014"
+})
+
+engine = create_engine(uri)
+engine.connect()
+
+base = automap_base()
+
+yaml_content = 
+"""
+$from: Product
+$column:
+  -
+      $name: Color
+      $alias: Color of Product
+  -
+      $name: ListPrice
+      $alias: List Price of Product
+      $func: avg
+$where:
+  -
+  $name: Color
+  $filter:
+    $nis: null
+  -
+    $name: SellStartDate
+    $filter:
+      $gt: 2013-01-01
+$group:
+  -
+      $name: Color
+$order:
+  -
+    $name: Name
+    $direction: asc
+$limit: 10
+$offset: 0
+"""
+
+engine = get_engine()
+base.prepare(engine, reflect=True)
+session = Session(engine)
+qs = parse(yaml_content, session, base).to_query()
+
+df = pd.read_sql_query(qs.statement, session.connection())
+
 ```
 
 ## YAML Query Language Syntax
@@ -16,7 +81,7 @@ Description
 
 ### FROM
 
-Name of the table from which to select data. For now, YMLAlchemy supports only one table.
+Name of the table from which to select data. For now, YAMLAlchemy supports only one table.
 
 | Identifier | Data Type |
 |--|--|

@@ -1,10 +1,9 @@
 import unittest
-from ymlalchemy import parse
+from yamlalchemy import parse
 from sqlalchemy.engine import URL
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, Query
 from sqlalchemy.ext.automap import automap_base
-import pandas as pd
 
 base = automap_base()
 
@@ -85,12 +84,6 @@ class TestParser(unittest.TestCase):
         session = Session(engine)
         qs = parse(yaml_content, session, base).to_query()
         self.assertIsInstance(qs, Query)
-
-        df = pd.read_sql_query(qs.statement, session.connection())
-        # self.assertIsInstance(df, pd.DataFrame)
-        # self.assertListEqual(df.columns.tolist(), ['Stil', 'Ülke', 'Counf of Stars'])
-        print(qs.statement)
-        print(df)
 
 
 if __name__ == '__main__':

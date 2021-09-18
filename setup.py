@@ -2,14 +2,14 @@
 from setuptools import setup
 
 setup(
-    name='ymlalchemy',
+    name='yamlalchemy',
     version='0.1.0',
-    description='YMLAlchemy is a Python-based library to convert YAML to SQLAlchemy read-only queries.',
-    url='https://github.com/shuds13/pyexample',
+    description='YAMLAlchemy is a Python-based library to convert YAML to SQLAlchemy read-only queries.',
+    url='https://github.com/ahmetonol/yamlalchemy',
     author='Ahmet Onol',
     author_email='onol.ahmet@gmail.com',
     license='MIT',
-    packages=['ymlalchemy'],
+    packages=['yamlalchemy'],
     install_requires=[
         'PyYAML',
         'SQLAlchemy'

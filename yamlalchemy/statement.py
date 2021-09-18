@@ -3,7 +3,7 @@ __all__ = ['_order', '_where', '_where_comp', '_limit', '_offset', '_having']
 from typing import List
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.orm import Query
-from ymlalchemy.contants import *
+from yamlalchemy.contants import *
 from sqlalchemy.sql.expression import and_, or_, not_
 
 
