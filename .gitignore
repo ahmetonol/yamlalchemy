@@ -1,10 +1,11 @@
 .venv/*
 .vscode/*
 __pycache__/
- **/*.pyc
- *.pyc
+**/*.pyc
+*.pyc
 *.egg-info/
-dist
+dist/
+build/
 # dotenv
 .venv
 .env

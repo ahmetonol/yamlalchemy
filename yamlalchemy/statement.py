@@ -1,13 +1,14 @@
 __all__ = ['_order', '_where', '_where_comp', '_limit', '_offset', '_having']
 
-from typing import List
+from typing import List, Dict, Any, Optional
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.orm import Query
-from yamlalchemy.contants import *
+from sqlalchemy.sql.elements import BinaryExpression, BooleanClauseList
+from yamlalchemy.constants import *
 from sqlalchemy.sql.expression import and_, or_, not_
 
 
-def _where_comp(col: Column, comp: str, values: List[str]) -> List[Column]:
+def _where_comp(col: Column, comp: str, values: List[Any]) -> List[BinaryExpression]:
     if comp == COMP_NEQ:
         return [col != value for value in values]
     if comp == COMP_GT:
@@ -44,7 +45,7 @@ def _where_comp(col: Column, comp: str, values: List[str]) -> List[Column]:
         return [col.endswith(value) for value in values]
 
 
-def _where(col: Column, where_clause: List[dict]) -> Column:
+def _where(col: Column, where_clause: Dict[str, Any]) -> BooleanClauseList:
     """
     Definition
     """
@@ -82,14 +83,14 @@ def _order(col: Column, direction: str) -> Column:
     return col
 
 
-def _limit(limit: int, query: Query) -> Query:
+def _limit(limit: Optional[int], query: Query) -> Query:
     if limit is not None and isinstance(limit, int):
         query = query.limit(limit)
 
     return query
 
 
-def _offset(offset: int, query: Query) -> Query:
+def _offset(offset: Optional[int], query: Query) -> Query:
     if offset is not None and isinstance(offset, int):
         query = query.offset(offset)
 

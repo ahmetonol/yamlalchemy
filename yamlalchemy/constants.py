@@ -36,7 +36,18 @@ __all__ = [
     'COMPARATORS',
     'LIMIT',
     'OFFSET',
-    'HAVING'
+    'HAVING',
+    'JOIN',
+    'JOIN_TABLE',
+    'JOIN_ON',
+    'JOIN_LEFT_COL',
+    'JOIN_RIGHT_COL',
+    'JOIN_TYPE',
+    'JOIN_INNER',
+    'JOIN_LEFT_OUTER',
+    'JOIN_RIGHT_OUTER',
+    'JOIN_FULL_OUTER',
+    'JOIN_TYPES'
 ]
 
 
@@ -54,6 +65,21 @@ DIRECTION = '$direction'
 WHERE = '$where'
 FILTER = '$filter'
 HAVING = '$having'
+
+# JOIN constants
+JOIN = '$join'
+JOIN_TABLE = '$table'
+JOIN_ON = '$on'
+JOIN_LEFT_COL = '$left'
+JOIN_RIGHT_COL = '$right'
+JOIN_TYPE = '$type'
+
+# JOIN types
+JOIN_INNER = 'inner'
+JOIN_LEFT_OUTER = 'left'
+JOIN_RIGHT_OUTER = 'right'
+JOIN_FULL_OUTER = 'outer'
+JOIN_TYPES = {JOIN_INNER, JOIN_LEFT_OUTER, JOIN_RIGHT_OUTER, JOIN_FULL_OUTER}
 
 OP_AND = "$and"
 OP_OR = "$or"

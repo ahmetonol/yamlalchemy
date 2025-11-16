@@ -70,7 +70,6 @@ $limit: 10
 $offset: 0
 """
 
-engine = get_engine()
 base.prepare(engine, reflect=True)
 session = Session(engine)
 qs = parse(yaml_content, session, base).to_query()
@@ -159,7 +158,7 @@ Field names of the table you want to sort result-set in ascending or descending 
 | Identifier | Description | Required | Defaults |
 |--|--|--|--|
 | `$name` | Name of column | `True` | -- |
-| `$direction` | Ascending or descending order | `Fase` | `asc` or `desc` |
+| `$direction` | Ascending or descending order | `False` | `asc` or `desc` |
 
 *Usage:*  
 
@@ -169,6 +168,52 @@ $order:
     $name: Name
     $direction: asc
 ```
+
+### JOIN
+
+Combine rows from two or more tables based on a related column between them.
+
+| Identifier | Data Type |
+|--|--|
+| `$join` | List |
+
+*JOIN Definition:*
+
+| Identifier | Description | Required | Defaults |
+|--|--|--|--|
+| `$table` | Name of the table to join with | `True` | -- |
+| `$on` | Join condition definition | `True` | -- |
+| `$type` | Type of join (inner, left, right, outer) | `False` | `inner` |
+
+*JOIN ON Definition:*
+
+| Identifier | Description | Required |
+|--|--|--|
+| `$left` | Left column in format `Table.Column` | `True` |
+| `$right` | Right column in format `Table.Column` | `True` |
+
+*Usage:*
+
+```yaml
+$join:
+  -
+    $table: Category
+    $on:
+      $left: Product.CategoryID
+      $right: Category.CategoryID
+    $type: inner
+  -
+    $table: Supplier
+    $on:
+      $left: Product.ProductID
+      $right: Supplier.ProductID
+    $type: left
+```
+
+**Important Notes:**
+- When selecting columns from joined tables, use the `Table.Column` format in `$column` definitions
+- Multiple joins are supported
+- Join types: `inner`, `left`, `right`, `outer`
 
 ### WHERE
 
@@ -313,14 +358,24 @@ $offset: 10
 
 ## Running tests
 
+Run all tests:
 ```shell
- python -m unittest tests/test_parser.py
+python -m unittest discover tests -v
+```
+
+Run specific test files:
+```shell
+# Unit tests (33 tests)
+python -m unittest tests/test_parser_unit.py -v
+
+# SQL validation tests (12 tests)
+python -m unittest tests/test_sql_validation.py -v
 ```
 
 ## Roadmap
 
-- Joins
 - Sub Queries
+- ~~JOIN support~~ ✅ Completed (v0.2.0)
 
 ## License
 
